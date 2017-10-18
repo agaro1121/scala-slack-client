@@ -1,5 +1,7 @@
 # README #
 
+# Updates coming soon !!!!
+
 This is my attempt to provide a library that will allow users to create bots.
 
 The first thing you need to do is create a `token.conf` file with one configuration.

@@ -3,8 +3,8 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val AkkaHttp = "10.0.8"
-    val Akka = "2.5.2"
+    val AkkaHttp = "10.0.10"
+    val Akka = "2.5.6"
     val Circe = "0.8.0"
     val Cats = "0.9.0"
     val PureConfig = "0.7.2"

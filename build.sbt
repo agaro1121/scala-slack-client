@@ -42,4 +42,13 @@ val web = project
   .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
   .dependsOn(core)
   .settings(sharedPublishSettings: _*)
+
+val root = project
+  .in(file("."))
+  .settings(sharedPublishSettings: _*)
+  .aggregate(core, sharedEvents, rtm, web)
   .enablePlugins(GitVersioning)
+
+publishArtifact in root := false
+publish in root := {}
+publishLocal in root := {}

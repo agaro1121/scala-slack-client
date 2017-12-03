@@ -9,7 +9,7 @@ object Publish {
   private val MilestoneRegex = "^M[0-9]$".r
   private lazy val versioningSettings: Seq[sbt.Def.SettingsDefinition] =
     Seq(
-      git.baseVersion := "0.0.0",
+      git.baseVersion := "0.1.3-SNAPSHOT",
       git.useGitDescribe := true,
       git.uncommittedSignifier := None,
       git.gitTagToVersionNumber := {

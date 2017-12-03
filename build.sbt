@@ -1,9 +1,5 @@
 import Publish.sharedPublishSettings
 
-organization in ThisBuild := "com.github.agaro1121"
-scalaVersion in ThisBuild := "2.12.4"
-crossScalaVersions in ThisBuild := Seq("2.11.11", scalaVersion.value)
-
 val compileSettings = Seq(
   libraryDependencies ++= Dependencies.compile
 )

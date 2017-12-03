@@ -9,7 +9,7 @@ object Publish {
   private val MilestoneRegex = "^M[0-9]$".r
   private lazy val versioningSettings: Seq[sbt.Def.SettingsDefinition] =
     Seq(
-      git.baseVersion := "0.0.0",
+      git.baseVersion := "0.1.3-SNAPSHOT",
       git.useGitDescribe := true,
       git.uncommittedSignifier := None,
       git.gitTagToVersionNumber := {
@@ -42,7 +42,8 @@ object Publish {
     bintrayReleaseOnPublish := false,
     publishMavenStyle := true,
     bintrayRepository := organization.value,
-    bintrayOrganization in bintray := None
-  ) //++ versioningSettings //TODO: for some reason adding this stops snapshots from being published
+    bintrayOrganization in bintray := None,
+    organization in ThisBuild := "com.github.agaro1121"
+  ) ++ versioningSettings //TODO: for some reason adding this stops snapshots from being published
 
 }

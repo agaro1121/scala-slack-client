@@ -50,5 +50,5 @@ val root = project
   .enablePlugins(GitVersioning)
 
 publishArtifact in root := false
-publish in root := {}
-publishLocal in root := {}
+// publish in root := {}
+// publishLocal in root := {}

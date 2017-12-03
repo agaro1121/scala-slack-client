@@ -45,6 +45,7 @@ val web = project
 
 val root = project
   .in(file("."))
+  .settings(sharedPublishSettings: _*)
   .aggregate(core, sharedEvents, rtm, web)
   .settings(Project.defaultSettings ++ Seq(
     publishArtifact:= false,
@@ -52,6 +53,3 @@ val root = project
     publish := {}
   ))
   .enablePlugins(GitVersioning)
-
-// publish in root := {}
-// publishLocal in root := {}

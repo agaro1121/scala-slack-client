@@ -44,6 +44,6 @@ object Publish {
     bintrayRepository := organization.value,
     bintrayOrganization in bintray := None,
     organization in ThisBuild := "com.github.agaro1121"
-  ) //++ versioningSettings //TODO: for some reason adding this stops snapshots from being published
+  ) ++ versioningSettings //TODO: for some reason adding this stops snapshots from being published
 
 }

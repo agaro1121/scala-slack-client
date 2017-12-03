@@ -41,6 +41,7 @@ val web = project
 
 val root = project
   .in(file("."))
+  .settings(sharedPublishSettings: _*)
   .settings(publishArtifact := false)
   .settings(publish := {})
   .settings(publishLocal := {})

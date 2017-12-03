@@ -10,6 +10,8 @@ val core = project
   .settings(compileSettings)
   .settings(libraryDependencies += Dependencies.ScalaTest)
   .settings(sharedPublishSettings: _*)
+  .enablePlugins(GitVersioning)
+
 
 val sharedEvents = project
   .in(file("shared_events"))
@@ -18,6 +20,7 @@ val sharedEvents = project
   .dependsOn(core)
   .settings(libraryDependencies += Dependencies.ScalaTest)
   .settings(sharedPublishSettings: _*)
+  .enablePlugins(GitVersioning)
 
 val rtm = project
   .in(file("rtm"))
@@ -28,6 +31,7 @@ val rtm = project
   .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
   .dependsOn(core, sharedEvents)
   .settings(sharedPublishSettings: _*)
+  .enablePlugins(GitVersioning)
 
 val web = project
   .in(file("web"))
@@ -38,12 +42,4 @@ val web = project
   .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
   .dependsOn(core)
   .settings(sharedPublishSettings: _*)
-
-val root = project
-  .in(file("."))
-  .settings(sharedPublishSettings: _*)
-  .settings(publishArtifact := false)
-  .settings(publish := {})
-  .settings(publishLocal := {})
-  .aggregate(core, sharedEvents, rtm, web)
   .enablePlugins(GitVersioning)

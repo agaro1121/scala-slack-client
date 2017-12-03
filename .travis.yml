@@ -13,7 +13,7 @@ cache:
 script:
 - sbt ++$TRAVIS_SCALA_VERSION clean test
 - if [ $TRAVIS_TEST_RESULT -eq 0 -a "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH"
-  = "master" ]; then echo "** Publishing Snapshot from master **" && tar xf secrets.tar
+  = "master" ]; then echo "** Publishing Snapshot from master **" && tar xf publishing
   && cp -r .bintray $HOME && sbt ++$TRAVIS_SCALA_VERSION publish; fi
 before_cache:
 - find $HOME/.sbt -name "*.lock" -print -delete

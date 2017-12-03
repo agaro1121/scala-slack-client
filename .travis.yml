@@ -1,14 +1,26 @@
 sudo: false
 language: scala
 scala:
-  - 2.11.11
-  - 2.12.4
+- 2.11.11
+- 2.12.4
 jdk:
 - oraclejdk8
 cache:
   directories:
-    - "$HOME/.m2/repository" 
-    - "$HOME/.sbt" 
-    - "$HOME/.ivy2"     
+  - "$HOME/.m2/repository"
+  - "$HOME/.sbt"
+  - "$HOME/.ivy2"
 script:
-  - sbt ++$TRAVIS_SCALA_VERSION clean test
+- sbt ++$TRAVIS_SCALA_VERSION clean test
+- if [ $TRAVIS_TEST_RESULT -eq 0 -a "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH"
+  = "master" ]; then echo "** Publishing Snapshot from master **" && tar xf secrets.tar
+  && cp .bintray ~/ && sbt ++$TRAVIS_SCALA_VERSION publish; fi
+before_cache:
+- find $HOME/.sbt -name "*.lock" -print -delete
+env:
+  global:
+  - secure: pKougE4/Y52L4xmLtQliWM0VSOyHCqxiT65Wu5CChkkOcobS8WbCqONSpe/oESExX8bTGUoeRU2iXcw7n1iazFy5MR8XbK1dNyPdt1U3y2K6UelQb7+w3taa1OzHu9d1Iham4R2p8f07eX5MUCA/H03nY89iqRNfl1L2jTZjZztG7wHxCxXh6Ynx2GxMVtMDN2A1JcZX4RvWK5UZ6y2Y0/2HtE/WJSI3PDD9fTIYlfa4ugDC1lucsCI4F3FFsClkrzgMnCDeuwowHoWJxO+wBYaXGIT5AiRN8fHgAySeWfJrLdONpi0ADAUAZwsrnWeLDBLhX/UTxU3ObZo//CKyyoiplCa+OA166VonGefbsSC8cZ8x4ikeK0+0EE+yxNYeMbU4taa53LI28572hG525nuc2h7MIZFL7V43UlFrWfWRj3/tyS5hC/dvv2I5+3+Up2eDqrkgbKUHYUrHzBBGoDjOaJVrKNCn0K4/DH/PLVE+69NyaaV5dVrs3zVNlj5TcwJC0cY3tiLo7xTdwr28HGuer7qkGPjHPa6lolkzFtbRbOZLkOMGIFtUUPrXswCvGxwfD29AIvvIb36/anzVjwHGSj1WKeRLZ96hkRFwC1lpk/XR0Dw6SLry/KfjddLA+kCyGqifk7qk8AzfOB6cpWYoLEJutarbVM1C/yQUWWs=
+  - secure: dQR87nz6py9GUbfXdHPoLoYIFp1ytqqZX5SK0/wRHZzTqjy+eJ2KbjofPkauAr023uvYy8XdQA9skA9yWGYQXlQTfAtXsNCuv4gDwa0twumgJvTw13CATSqUJ5VczbMhqoSsMpU2KOehEsxbu7hXwXhhmoQbC1FB6sTMXAHjtKUpeUnz7cDAdDrSAvxdbq4jP06pBsxQr8UZ8D9WfvghYzY9t7jvS7xNdlTwnsgCmEG2l98OCdDbIoLMLMylQ4X8bLqZQo8wbl9fAJvmNI8wTvM9bxoaSewf4yzgeGM00Hg1qRZSKCYaL9/qkJCNvFPpEsOuaEyUaBhbGcEAkMmvzMHhNSuTfPAAFDrXFAUve6UmUIgJlE+/gPbGN8hYyJFjIqdspJUQPqy2a9mc1o1JWcfZdhoELSBd8eqpUDbPxSkpys2RoEDP9TM8jydPGokrcx/I5rKpiEdrkEpLX4p+wH/EH0sulJgEeKSpxGqjpIJKTZ9NmPwScBYkNv6Zy/Gku+LljmRo7x+qTDSN+i9H2GtJaprPhZnsIz9SnBEZ2rB75jqA4RTLPGsB0WBrnrKTLjzylUccCwF+/pO4RHKeW92WzMRoT2Tyo89ya9j7SAY7xYQmuU5A0XegEJyxJuWg9+Z6GB2xiWL0lG9OScAMaEZssGoRrhxkwDIuSIqc1jI=
+before_install:
+- openssl aes-256-cbc -K $encrypted_f8adff21267b_key -iv $encrypted_f8adff21267b_iv
+  -in publishing.enc -out publishing -d

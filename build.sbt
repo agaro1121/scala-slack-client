@@ -50,6 +50,7 @@ val root = project
   .settings(Project.defaultSettings ++ Seq(
     publishArtifact:= false,
     publishLocal := {},
-    publish := {}
+    publish := {},
+    bintrayRelease := {}
   ))
   .enablePlugins(GitVersioning)

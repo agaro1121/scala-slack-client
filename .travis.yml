@@ -28,6 +28,6 @@ env:
   - secure: vm0pF5zRBlEmvOuay8EBMkuF0xu96yVzMIVrFHHINC5WKFBZMsffsyGajr6SNo1EhcB4rIoytYsgTatD/nG0Sbl5XxJrqFACw62dJUo5ADry4khkS1AKbO7OmLXfEPmQw4tPaPnkyMYXs+EQgDjP7MkrxqJteEVUCneSh+d0ZTdVGouJzbxhT0mq/cnkuypyTCOSoq6+yJTC3gpRpKCwGDZ7Hn0SEyYQF46m4nLSXL27ixSjG+va6g8XVFi1cQMBlexrDm7YW7eAGjKCQaiHNjdeROcZPPPtQyQhXSEofpyrJO8bfcXQWVfeTjDJ/XqRK/mA6aNCdK6/KHh8AmrbY4zLVAwRirbiE6nHhH19gN0mfMuU2EI+qDfW9DtaZMpXMMJM7h5nIRLkwX+kvleSTr/KDfTJG9MXdnPy6zKKFI0XVeaDMYMyf1n0Ze3/5piIyvLOsTzdJBq+suG8SE13j6vYD1P0XMTZ2Bb3ZUIugwYQKwcUM7zF3MTlmyDVR9rUQCh/r1u1REjNikpw40rhuj1prAKaPZy0RHQZ8zGMn7dFh9XsetTZL8y5+mCMGJpLKhoO/e0Ov8Ja7VGL+Xz3wFKzl+zkmkD0vgq4SboNjfJuPcSDE8e/mmT5e9A8/3Xo3rE8Ua3FTTbgcaMecd7NKacVGvtEXkjdJa671pV98Sg=
 before_install:
 - openssl aes-256-cbc -K $encrypted_d6dc64042087_key -iv $encrypted_d6dc64042087_iv
-  -in travis/secrets.tar.enc -out travis/local.secrets.tar -d; tar xf -C travis -f travis/secrets.tar;
+  -in travis/secrets.tar.enc -out travis/local.secrets.tar -d; tar xf travis/local.secrets.tar -C travis
 - openssl aes-256-cbc -K $encrypted_f8adff21267b_key -iv $encrypted_f8adff21267b_iv
   -in publishing.enc -out publishing -d

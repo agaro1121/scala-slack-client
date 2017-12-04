@@ -54,3 +54,8 @@ val root = project
     bintrayRelease := {}
   ))
   .enablePlugins(GitVersioning)
+
+useGpg := false
+pgpPublicRing := file("./travis/local.pubring.asc")
+pgpSecretRing := file("./travis/local.secring.asc")
+pgpPassphrase := sys.env.get("PGP_PASS").map(_.toArray)

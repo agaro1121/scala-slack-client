@@ -157,3 +157,4 @@ project/plugins/project/
 /.ensime_cache/
 /.ensime
 publishing
+local.*

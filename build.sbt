@@ -56,6 +56,6 @@ val root = project
   .enablePlugins(GitVersioning)
 
 useGpg := false
-pgpPublicRing := file("./travis/local.pubring.asc")
-pgpSecretRing := file("./travis/local.secring.asc")
+pgpPublicRing := baseDirectory.value / "travis" / "local.pubring.asc"
+pgpSecretRing := baseDirectory.value / "travis" / "local.secring.asc"
 pgpPassphrase := sys.env.get("PGP_PASS").map(_.toArray)

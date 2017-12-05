@@ -51,7 +51,8 @@ val root = project
     publishArtifact:= false,
     publishLocal := {},
     publish := {},
-    bintrayRelease := {}
+    bintrayRelease := {},
+    bintraySyncMavenCentral := {}
   ))
   .enablePlugins(GitVersioning)
 

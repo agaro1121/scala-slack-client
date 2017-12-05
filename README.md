@@ -13,8 +13,8 @@ You can create your bot on slack and obtain a token.
 Add the following to your build.sbt
 
 ```scala
-resolvers += "Artifactory Realm" at "http://oss.jfrog.org/artifactory/oss-snapshot-local"
-libraryDependencies += "com.github.agaro1121" %% "scala-slack-rtm" % "0.1.1-SNAPSHOT"
+libraryDependencies += "com.github.agaro1121" %% "scala-slack-rtm" % "0.2.13"
+libraryDependencies += "com.github.agaro1121" %% "scala-slack-web" % "0.2.13"
 ```
 
 

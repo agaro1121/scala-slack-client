@@ -15,7 +15,7 @@ script:
 - if [ $TRAVIS_TEST_RESULT -eq 0 -a "$TRAVIS_PULL_REQUEST" = "false" ] && [[ "$TRAVIS_TAG"
   =~ ^v[0-9]+\.[0-9]+(\.[0-9]+)?(-M[0-9]+)?$ ]]; then echo "** Publishing Release
   $TRAVIS_TAG **" && tar xf publishing && cp -r .bintray $HOME && sbt ++$TRAVIS_SCALA_VERSION
-  publishSigned && sbt ++$TRAVIS_SCALA_VERSION bintrayRelease && sbt ++$TRAVIS_SCALA_VERSION bintraySyncMavenCentral; fi
+  publishSigned && sbt ++$TRAVIS_SCALA_VERSION bintrayRelease && sleep 30 && sbt ++$TRAVIS_SCALA_VERSION bintraySyncMavenCentral; fi
 - if [ $TRAVIS_TEST_RESULT -eq 0 -a "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH"
   = "master" ]; then echo "** Publishing Snapshot from master **" && tar xf publishing
   && cp -r .bintray $HOME && sbt ++$TRAVIS_SCALA_VERSION publishSigned; fi

@@ -3,7 +3,7 @@ package com.github.agaro1121.common
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import akka.testkit.TestKit
-import com.github.agaro1121.client.SlackWebApiClient
+import com.github.agaro1121.web.client.SlackWebApiClient
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfterAll, Matchers, WordSpecLike}
 import org.scalatest.time.{Millis, Seconds, Span}

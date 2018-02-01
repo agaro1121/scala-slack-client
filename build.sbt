@@ -22,9 +22,9 @@ val sharedEvents = project
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
 
-val rtm = project
-  .in(file("rtm"))
-  .settings(name := "scala-slack-rtm")
+val rtmLite = project
+  .in(file("rtm_lite"))
+  .settings(name := "scala-slack-rtm-lite")
   .settings(compileSettings)
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
@@ -32,6 +32,18 @@ val rtm = project
   .dependsOn(core, sharedEvents)
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
+
+val rtm = project
+  .in(file("rtm"))
+  .settings(name := "scala-slack-rtm")
+  .settings(compileSettings)
+  .configs(IntegrationTest)
+  .settings(Defaults.itSettings: _*)
+  .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
+  .dependsOn(rtmLite)
+  .settings(sharedPublishSettings: _*)
+  .enablePlugins(GitVersioning)
+
 
 val web = project
   .in(file("web"))
@@ -46,7 +58,7 @@ val web = project
 val root = project
   .in(file("."))
   .settings(sharedPublishSettings: _*)
-  .aggregate(core, sharedEvents, rtm, web)
+  .aggregate(core, sharedEvents, rtmLite, rtm, web)
   .settings(Project.defaultSettings ++ Seq(
     publishArtifact:= false,
     publishLocal := {},

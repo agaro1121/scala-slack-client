@@ -58,7 +58,7 @@ val web = project
 val root = project
   .in(file("."))
   .settings(sharedPublishSettings: _*)
-  .aggregate(core, sharedEvents, rtmLite, rtm, web)
+  .aggregate(core, sharedEvents, web, rtmLite, rtm)
   .settings(Project.defaultSettings ++ Seq(
     publishArtifact:= false,
     publishLocal := {},

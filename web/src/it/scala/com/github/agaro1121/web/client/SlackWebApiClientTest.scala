@@ -1,4 +1,4 @@
-package com.github.agaro1121.sharedevents.client
+package com.github.agaro1121.web.client
 
 import com.github.agaro1121.common.SlackWebApiTestSuite
 

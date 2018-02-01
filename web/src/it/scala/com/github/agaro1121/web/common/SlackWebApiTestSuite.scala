@@ -1,4 +1,4 @@
-package com.github.agaro1121.common
+package com.github.agaro1121.web.common
 
 import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer

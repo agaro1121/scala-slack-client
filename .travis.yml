@@ -19,6 +19,7 @@ script:
   sbt ++$TRAVIS_SCALA_VERSION "project rtm" bintraySyncMavenCentral &&
   sbt ++$TRAVIS_SCALA_VERSION "project core" bintraySyncMavenCentral &&
   sbt ++$TRAVIS_SCALA_VERSION "project web" bintraySyncMavenCentral &&
+  sbt ++$TRAVIS_SCALA_VERSION "project rtmLite" bintraySyncMavenCentral &&
   sbt ++$TRAVIS_SCALA_VERSION "project sharedEvents" bintraySyncMavenCentral; fi
 - if [ $TRAVIS_TEST_RESULT -eq 0 -a "$TRAVIS_PULL_REQUEST" = "false" -a "$TRAVIS_BRANCH"
   = "master" ]; then echo "** Publishing Snapshot from master **" && tar xf publishing

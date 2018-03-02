@@ -1,6 +1,6 @@
 package com.github.agaro1121.web.client
 
-import com.github.agaro1121.common.SlackWebApiTestSuite
+import com.github.agaro1121.web.common.SlackWebApiTestSuite
 
 class SlackWebApiClientTest extends SlackWebApiTestSuite {
 

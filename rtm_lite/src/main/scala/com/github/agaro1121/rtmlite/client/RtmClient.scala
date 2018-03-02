@@ -86,13 +86,12 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
 
 
   def connectUsingPF(pf: PartialFunction[models.Message, models.Message]) =
-    connectUsingFlow(Flow[models.Message].collect(pf))
+    connectUsingPFAsync(pf.andThen(Future.successful))
 
-
-  def connectUsingFlow(flow: Flow[models.Message, models.Message, NotUsed]) = connect(
+  def connectUsingPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]) = connect(
       wsMessage2Json
         .via(json2SlackMessage)
-        .via(flow)
+        .mapAsync(Runtime.getRuntime.availableProcessors)(pf)
         .via(slackMessage2Json)
         .via(json2WsMessage)
     )

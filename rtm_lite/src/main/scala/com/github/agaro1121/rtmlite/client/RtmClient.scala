@@ -50,43 +50,9 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
       _.flatMap(_.as[models.Message])
     }.collect{ case t if t.isRight => t.right.get }
 
-  /**
-    * @param usersActor Your actor that handles Slack messages.
-    *                   This actor needs to extend [[AbilityToRespondToRtm]] so
-    *                   it can reply to slack
-    **/
-  def connect(usersActor: ActorRef): Future[Either[HttpError, RtmStatus]] = {
-
-    /*
-    * Actors reply with [[Object]] type
-    * this will handle the transition to a proper type
-    * */
-    val actorReply2SlackMessage: Flow[Object, Json, NotUsed] =
-      Flow[Object].map {
-        case event: models.Message =>
-          event.asJson
-      }
-
-
-    val sink: Sink[Message, NotUsed] = {
-      wsMessage2Json.via(json2SlackMessage)
-    }.to(Sink.actorRef(usersActor, PoisonPill))
-
-    val source: Source[Message, ActorRef] = {
-      Source.actorRef[Message](0, OverflowStrategy.fail) //TODO: change to actorRefWithAck for backpressure support
-        .mapMaterializedValue { actorThatTalksToSlack =>
-        logger.info("Switching your actor to receive messages...")
-        usersActor ! AbilityToRespondToRtm.ConnectedTo(actorThatTalksToSlack)
-        actorThatTalksToSlack
-      }.via(actorReply2SlackMessage).via(json2WsMessage)
-    }
-
-    connect(Flow.fromSinkAndSource(sink, source))
-  }
-
 
   def connectUsingPF(pf: PartialFunction[models.Message, models.Message]) =
-    connectUsingPFAsync(pf.andThen(Future.successful))
+  connectUsingPFAsync(pf.andThen(Future.successful))
 
   def connectUsingPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]) = connect(
       wsMessage2Json
@@ -111,7 +77,6 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
         }
     }.leftMap(Future.successful).value.flatMap(_.bisequence)
   }
-
 
 
 }

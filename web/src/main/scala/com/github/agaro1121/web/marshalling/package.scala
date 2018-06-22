@@ -1,10 +1,10 @@
 package com.github.agaro1121.web
 
-import de.heikoseeberger.akkahttpcirce.CirceSupport
+import de.heikoseeberger.akkahttpcirce.ErrorAccumulatingCirceSupport
 
 package object marshalling {
 
-  trait AllDecoders extends WebApiDecoders with CirceSupport
-  trait AllEncoders extends WebApiEncoders with CirceSupport
+  trait AllDecoders extends WebApiDecoders with ErrorAccumulatingCirceSupport
+  trait AllEncoders extends WebApiEncoders with ErrorAccumulatingCirceSupport
 
 }

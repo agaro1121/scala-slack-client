@@ -24,11 +24,12 @@ object Publish {
 
   lazy val sharedPublishSettings: Seq[SettingsDefinition]  = Seq(
     publishTo := {
+      val prodPublishResolver = publishTo.value
       if (isSnapshot.value){
         Some("Artifactory Realm" at "http://oss.jfrog.org/artifactory/oss-snapshot-local")
       }
       else {
-        publishTo.value
+        prodPublishResolver
       }
     },
     bintrayPackage := name.value,

@@ -3,15 +3,15 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val AkkaHttp = "10.0.10"
-    val Akka = "2.5.6"
-    val Circe = "0.8.0"
-    val Cats = "0.9.0"
-    val PureConfig = "0.7.2"
-    val ScalaLogging = "3.5.0"
-    val AkkaHttpCirce = "1.12.0"
-    val LogBack = "1.1.7"
-    val ScalaTest = "3.0.1"
+    val AkkaHttp = "10.1.3"
+    val Akka = "2.5.13"
+    val Circe = "0.9.3"
+    val Cats = "1.0.1"
+    val PureConfig = "0.9.1"
+    val ScalaLogging = "3.9.0"
+    val AkkaHttpCirce = "1.21.0"
+    val LogBack = "1.2.3"
+    val ScalaTest = "3.0.5"
   }
 
 
@@ -19,7 +19,7 @@ object Dependencies {
   lazy val AkkaStream = "com.typesafe.akka" %% "akka-stream" % Versions.Akka
   lazy val AkkaTestkit = "com.typesafe.akka" %% "akka-testkit" % Versions.Akka
 
-  val Cats = "org.typelevel" %% "cats" % Versions.Cats
+  val Cats = "org.typelevel" %% "cats-core" % Versions.Cats
 
   val Circe = Seq(
     "io.circe" %% "circe-core",

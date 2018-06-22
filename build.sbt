@@ -33,6 +33,8 @@ val rtmLite = project
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
 
+/*
+// Deprecated
 val rtm = project
   .in(file("rtm"))
   .settings(name := "scala-slack-rtm")
@@ -43,7 +45,7 @@ val rtm = project
   .dependsOn(rtmLite)
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
-
+*/
 
 val web = project
   .in(file("web"))
@@ -58,8 +60,8 @@ val web = project
 val root = project
   .in(file("."))
   .settings(sharedPublishSettings: _*)
-  .aggregate(core, sharedEvents, web, rtmLite, rtm)
-  .settings(Project.defaultSettings ++ Seq(
+  .aggregate(core, sharedEvents, web, rtmLite)
+  .settings(Defaults.coreDefaultSettings ++ Seq(
     publishArtifact:= false,
     publishLocal := {},
     publish := {},
@@ -72,3 +74,4 @@ useGpg := false
 pgpPublicRing := baseDirectory.value / "travis" / "local.pubring.asc"
 pgpSecretRing := baseDirectory.value / "travis" / "local.secring.asc"
 pgpPassphrase := sys.env.get("PGP_PASS").map(_.toArray)
+scalacOptions in ThisBuild += "-Ypartial-unification"

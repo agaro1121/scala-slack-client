@@ -21,40 +21,21 @@ import io.circe.{Json, ParsingFailure}
 import scala.concurrent.Future
 
 class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
-  extends LazyLogging with AbilityToConnectToRtm {
+  extends LazyLogging
+    with AbilityToConnectToRtm
+    with AkkaStreamsComponents
+    with UntypedActorStreamComponents {
 
   private def request(webSocketUrl: String) = WebSocketRequest(uri = webSocketUrl)
 
   private def getWebSocketUrl: Future[Either[HttpError, String]] =
     EitherT(rtmConnect()).map(_.url).value
 
-  val wsMessage2Json: Flow[Message, Either[ParsingFailure, Json], NotUsed] =
-    Flow[Message]
-      .map { msg =>
-        val json: String = msg.asTextMessage.getStrictText
-        parse(json).map(JsonUtils.convertTypeFieldToCapitalCamel)
-      }
+  def connectUsingPF(pf: PartialFunction[models.Message, models.Message]): Future[Either[HttpError, RtmStatus]] =
+    connectUsingPFAsync(pf.andThen(Future.successful))
 
-  val json2WsMessage: Flow[Json, Message, NotUsed] =
-    Flow[Json].map { json =>
-      TextMessage.Strict(json.toString)
-    }
-
-  val slackMessage2Json: Flow[models.Message, Json, NotUsed] =
-    Flow[models.Message].map{ msg =>
-      msg.asJson.deepMerge(Json.obj(("type", Json.fromString("message"))))
-    }
-
-  val json2SlackMessage: Flow[Either[ParsingFailure, Json], models.Message, NotUsed] =
-    Flow[Either[ParsingFailure, Json]].map {
-      _.flatMap(_.as[models.Message])
-    }.collect{ case t if t.isRight => t.right.get }
-
-
-  def connectUsingPF(pf: PartialFunction[models.Message, models.Message]) =
-  connectUsingPFAsync(pf.andThen(Future.successful))
-
-  def connectUsingPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]) = connect(
+  def connectUsingPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]): Future[Either[HttpError, RtmStatus]] =
+    connect(
       wsMessage2Json
         .via(json2SlackMessage)
         .mapAsync(Runtime.getRuntime.availableProcessors)(pf)
@@ -62,6 +43,8 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
         .via(json2WsMessage)
     )
 
+  def connectUsingUntypedActor(actorRef: ActorRef): Future[Either[HttpError, RtmStatus]] =
+    connect(untypedActorFlow(actorRef))
 
   private def connect(flow: Flow[Message, Message, NotUsed]): Future[Either[HttpError, RtmStatus]] = {
     EitherT(getWebSocketUrl).map { rtmUrl =>
@@ -77,7 +60,6 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
         }
     }.leftMap(Future.successful).value.flatMap(_.bisequence)
   }
-
 
 }
 

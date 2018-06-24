@@ -36,8 +36,8 @@ trait AkkaStreamsComponents {
       _.flatMap(_.as[models.Message])
     }.collect{ case t if t.isRight => t.right.get }
 
-  val wsMessage2SlackMessage: Flow[ws.Message, ws.Message, NotUsed] =
-    wsMessage2Json.collectType[Json].async.via(json2WsMessage)
+  val wsMessage2SlackMessage: Flow[ws.Message, models.Message, NotUsed] =
+    wsMessage2Json.async.via(json2SlackMessage)
 
   val slackMessage2WsMessage: Flow[models.Message, ws.Message, NotUsed] =
     slackMessage2Json.async.via(json2WsMessage)

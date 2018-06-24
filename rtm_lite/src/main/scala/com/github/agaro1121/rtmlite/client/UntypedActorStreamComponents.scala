@@ -12,7 +12,6 @@ trait UntypedActorStreamComponents extends LazyLogging {
   this: AkkaStreamsComponents =>
 
   def untypedActorFlow(usersActor: ActorRef): Flow[ws.Message, ws.Message, NotUsed] = {
-
     /*
     * Actors reply with [[Object]] type
     * this will handle the transition to a proper type

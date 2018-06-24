@@ -11,6 +11,7 @@ import io.circe.{Json, ParsingFailure}
 import io.circe.parser.parse
 import com.github.agaro1121.sharedevents.marshalling.GeneralEventEncoders.MessageEncoder
 import com.github.agaro1121.sharedevents.marshalling.GeneralEventDecoders.MessageDecoder
+import cats.syntax.either._ //for calling `map` on [[Either]] in Scala v2.11.x
 
 private[client] trait AkkaStreamsComponents {
 

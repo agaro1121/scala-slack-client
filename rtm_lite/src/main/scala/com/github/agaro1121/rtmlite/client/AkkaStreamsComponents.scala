@@ -12,7 +12,7 @@ import io.circe.parser.parse
 import com.github.agaro1121.sharedevents.marshalling.GeneralEventEncoders.MessageEncoder
 import com.github.agaro1121.sharedevents.marshalling.GeneralEventDecoders.MessageDecoder
 
-trait AkkaStreamsComponents {
+private[client] trait AkkaStreamsComponents {
 
   val wsMessage2Json: Flow[ws.Message, Either[ParsingFailure, Json], NotUsed] =
     Flow[ws.Message]

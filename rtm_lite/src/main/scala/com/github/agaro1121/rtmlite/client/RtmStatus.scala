@@ -1,8 +1,8 @@
 package com.github.agaro1121.rtmlite.client
 
-sealed trait RtmStatus extends Product with Serializable
+private[client] sealed trait RtmStatus extends Product with Serializable
 
-object RtmStatus {
+private[client] object RtmStatus {
 
   final case object Success extends RtmStatus
 

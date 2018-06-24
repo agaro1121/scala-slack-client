@@ -8,7 +8,7 @@ import akka.stream.scaladsl.{Flow, Sink, Source}
 import com.github.agaro1121.sharedevents.models
 import com.typesafe.scalalogging.LazyLogging
 
-trait UntypedActorStreamComponents extends LazyLogging {
+private[client] trait UntypedActorStreamComponents extends LazyLogging {
   this: AkkaStreamsComponents =>
 
   def untypedActorFlow(usersActor: ActorRef): Flow[ws.Message, ws.Message, NotUsed] = {

@@ -3,14 +3,14 @@ package com.github.agaro1121.rtmlite.client
 import akka.actor.{Actor, ActorRef}
 
 object AbilityToRespondToRtm {
-  case class ConnectedTo(actor: ActorRef)
+  final case class ConnectedTo(actorThatRepresentsSlack: ActorRef)
 }
 
 trait AbilityToRespondToRtm extends Actor {
 
   override def receive: Receive = {
-    case AbilityToRespondToRtm.ConnectedTo(wsActor) =>
-      context.become(receiveWithWsActorToRespond(wsActor))
+    case AbilityToRespondToRtm.ConnectedTo(actorThatRepresentsSlack) =>
+      context.become(receiveWithWsActorToRespond(actorThatRepresentsSlack))
   }
 
   def receiveWithWsActorToRespond(slack: ActorRef): Receive

@@ -1,22 +1,17 @@
 package com.github.agaro1121.rtmlite.client
 
 import akka.NotUsed
-import akka.actor.{ActorRef, ActorSystem, PoisonPill}
+import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes
-import akka.http.scaladsl.model.ws.{Message, TextMessage, WebSocketRequest}
-import akka.stream.scaladsl.{Flow, Sink, Source}
-import akka.stream.{Materializer, OverflowStrategy}
+import akka.http.scaladsl.model.ws
+import akka.http.scaladsl.model.ws.WebSocketRequest
+import akka.stream.scaladsl.Flow
+import akka.stream.Materializer
 import cats.data.EitherT
 import cats.implicits._
 import com.github.agaro1121.core.exceptions.HttpError
-import com.github.agaro1121.core.utils.JsonUtils
-import com.github.agaro1121.sharedevents.marshalling.GeneralEventDecoders.MessageDecoder
-import com.github.agaro1121.sharedevents.marshalling.GeneralEventEncoders.MessageEncoder
 import com.github.agaro1121.sharedevents.models
 import com.typesafe.scalalogging.LazyLogging
-import io.circe.parser.parse
-import io.circe.syntax.EncoderOps
-import io.circe.{Json, ParsingFailure}
 
 import scala.concurrent.Future
 
@@ -26,16 +21,17 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
     with AkkaStreamsComponents
     with UntypedActorStreamComponents {
 
-  private def request(webSocketUrl: String) = WebSocketRequest(uri = webSocketUrl)
+  private def request(webSocketUrl: String): WebSocketRequest =
+    WebSocketRequest(uri = webSocketUrl)
 
   private def getWebSocketUrl: Future[Either[HttpError, String]] =
     EitherT(rtmConnect()).map(_.url).value
 
-  def connectUsingPF(pf: PartialFunction[models.Message, models.Message]): Future[Either[HttpError, RtmStatus]] =
-    connectUsingPFAsync(pf.andThen(Future.successful))
+  def connectWithPF(pf: PartialFunction[models.Message, models.Message]): Future[Either[HttpError, RtmStatus]] =
+    connectWithPFAsync(pf.andThen(Future.successful))
 
-  def connectUsingPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]): Future[Either[HttpError, RtmStatus]] =
-    connect(
+  def connectWithPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]): Future[Either[HttpError, RtmStatus]] =
+    connectWithFlow(
       wsMessage2Json
         .via(json2SlackMessage)
         .mapAsync(Runtime.getRuntime.availableProcessors)(pf)
@@ -43,10 +39,10 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
         .via(json2WsMessage)
     )
 
-  def connectUsingUntypedActor(actorRef: ActorRef): Future[Either[HttpError, RtmStatus]] =
-    connect(untypedActorFlow(actorRef))
+  def connectWithUntypedActor(actorRef: ActorRef): Future[Either[HttpError, RtmStatus]] =
+    connectWithFlow(untypedActorFlow(actorRef))
 
-  private def connect(flow: Flow[Message, Message, NotUsed]): Future[Either[HttpError, RtmStatus]] = {
+  def connectWithFlow(flow: Flow[ws.Message, ws.Message, NotUsed]): Future[Either[HttpError, RtmStatus]] = {
     EitherT(getWebSocketUrl).map { rtmUrl =>
       httpClient.singleWebSocketRequest(request(rtmUrl), flow)._1
         .map { wsu =>

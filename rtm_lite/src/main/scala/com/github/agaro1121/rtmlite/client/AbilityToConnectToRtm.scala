@@ -10,7 +10,7 @@ import com.github.agaro1121.rtmlite.models.RtmConnectResponse
 
 import scala.concurrent.Future
 
-trait AbilityToConnectToRtm
+private[client] trait AbilityToConnectToRtm
   extends HttpClientPlumbing
   with RtmConnectResponseDecoders {
 

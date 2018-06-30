@@ -2,7 +2,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.stream.ActorMaterializer
 import com.github.agaro1121.rtmlite
 import com.github.agaro1121.rtmlite.client.AbilityToRespondToRtm
-import com.github.agaro1121.sharedevents.models.Message
+import com.github.agaro1121.rtmlite.models.Message
 
 object TestBot {
   def props: Props = Props(new TestBot())

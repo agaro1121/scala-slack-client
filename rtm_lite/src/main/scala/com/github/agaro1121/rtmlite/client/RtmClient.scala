@@ -10,7 +10,7 @@ import akka.stream.Materializer
 import cats.data.EitherT
 import cats.implicits._
 import com.github.agaro1121.core.exceptions.HttpError
-import com.github.agaro1121.sharedevents.models
+import com.github.agaro1121.rtmlite.models
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future

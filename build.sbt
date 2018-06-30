@@ -12,7 +12,6 @@ val core = project
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
 
-
 val sharedEvents = project
   .in(file("shared_events"))
   .settings(name := "scala-slack-shared-events")
@@ -29,23 +28,9 @@ val rtmLite = project
   .configs(IntegrationTest)
   .settings(Defaults.itSettings: _*)
   .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
-  .dependsOn(core, sharedEvents)
+  .dependsOn(core)
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
-
-/*
-// Deprecated
-val rtm = project
-  .in(file("rtm"))
-  .settings(name := "scala-slack-rtm")
-  .settings(compileSettings)
-  .configs(IntegrationTest)
-  .settings(Defaults.itSettings: _*)
-  .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
-  .dependsOn(rtmLite)
-  .settings(sharedPublishSettings: _*)
-  .enablePlugins(GitVersioning)
-*/
 
 val web = project
   .in(file("web"))

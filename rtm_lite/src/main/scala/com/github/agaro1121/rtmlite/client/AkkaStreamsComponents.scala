@@ -5,12 +5,10 @@ import akka.http.scaladsl.model.ws
 import akka.http.scaladsl.model.ws.TextMessage
 import akka.stream.scaladsl.Flow
 import com.github.agaro1121.core.utils.JsonUtils
-import com.github.agaro1121.sharedevents.models
 import io.circe.syntax._
 import io.circe.{Json, ParsingFailure}
 import io.circe.parser.parse
-import com.github.agaro1121.sharedevents.marshalling.GeneralEventEncoders.MessageEncoder
-import com.github.agaro1121.sharedevents.marshalling.GeneralEventDecoders.MessageDecoder
+import com.github.agaro1121.rtmlite.models
 import cats.syntax.either._ //for calling `map` on [[Either]] in Scala v2.11.x
 
 private[client] trait AkkaStreamsComponents {

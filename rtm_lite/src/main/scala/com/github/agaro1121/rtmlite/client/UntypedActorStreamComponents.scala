@@ -5,7 +5,7 @@ import akka.actor.{ActorRef, PoisonPill}
 import akka.http.scaladsl.model.ws
 import akka.stream.OverflowStrategy
 import akka.stream.scaladsl.{Flow, Sink, Source}
-import com.github.agaro1121.sharedevents.models
+import com.github.agaro1121.rtmlite.models
 import com.typesafe.scalalogging.LazyLogging
 
 private[client] trait UntypedActorStreamComponents extends LazyLogging {

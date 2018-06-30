@@ -39,6 +39,12 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
         .via(json2WsMessage)
     )
 
+  /**
+    * You can respond to Slack messages with an actor
+    * that extends [[AbilityToRespondToRtm]]
+    *
+    * @param actorRef Your actor that responds to [[models.Message]]
+    * */
   def connectWithUntypedActor(actorRef: ActorRef): Future[Either[HttpError, RtmStatus]] =
     connectWithFlow(untypedActorFlow(actorRef))
 

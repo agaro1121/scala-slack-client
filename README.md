@@ -13,8 +13,10 @@ You can create your bot on slack and obtain a token.
 Add the following to your build.sbt
 
 ```scala
-libraryDependencies += "com.github.agaro1121" %% "scala-slack-rtm" % "0.2.13"
-libraryDependencies += "com.github.agaro1121" %% "scala-slack-web" % "0.2.13"
+resolvers += Resolver.bintrayRepo("agaro1121", "com.github.agaro1121")
+
+libraryDependencies += "com.github.agaro1121" %% "scala-slack-rtm-lite" % "0.2.22"
+libraryDependencies += "com.github.agaro1121" %% "scala-slack-web" % "0.2.22"
 ```
 
 
@@ -23,28 +25,38 @@ This will be an actor
 It will look like this:
 
 ```scala
-import akka.actor.{ActorRef, Props}
-import com.github.agaro1121.client.AbilityToRespondToRtm
-import com.github.agaro1121.models.Message
+import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.stream.ActorMaterializer
+import com.github.agaro1121.rtmlite
+import com.github.agaro1121.rtmlite.client.AbilityToRespondToRtm
+import com.github.agaro1121.sharedevents.models.Message
 
-object MyActor {
-  def props: Props = Props(new MyActor())
+object TestBot {
+  def props: Props = Props(new TestBot())
 }
 
-class MyActor extends AbilityToRespondToRtm {
-
+class TestBot extends AbilityToRespondToRtm {
   override def receiveWithWsActorToRespond(slack: ActorRef): Receive = {
 
-    case message @ Message(_,_, _, "hello", _,_,_) =>
-      slack ! message.replyWithMessage("Hello this is MyBot")
+    case msg@Message(_, _, _, text, _, _, _) =>
+      slack ! msg.replyWithMessage(s"Test Bot received message: $text")
 
-    
   }
 }
+
+object TestBotTester extends App {
+
+  implicit val system = ActorSystem("main")
+  implicit val mat = ActorMaterializer()
+  import system.dispatcher
+
+  val rtmClient = rtmlite.client.RtmClient()
+  val testBot = system.actorOf(TestBot.props)
+
+  rtmClient.connectWithUntypedActor(testBot).onComplete(println)
+}
 ```
-Your bot will most likely be responding to messages but the library includes all events that flow through 
-slack's event stream. You can choose to react to them as you see fit.
 
-More examples to come. I will have a reference application uploaded soon.
-
-This is still far from a 1.0 and still has many kinks to work out but it's stable and can be actively used.
+You can also interact with Slack with the following:
+  - `PartialFunction[models.Message, models.Message]`
+  - `PartialFunction[models.Message, Future[models.Message]]`

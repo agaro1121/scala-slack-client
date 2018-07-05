@@ -3,7 +3,7 @@ package com.github.agaro1121.rtmlite.client
 import akka.NotUsed
 import akka.http.scaladsl.model.ws
 import akka.http.scaladsl.model.ws.TextMessage
-import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.{Flow, JsonFraming}
 import com.github.agaro1121.core.utils.JsonUtils
 import com.github.agaro1121.sharedevents.models
 import io.circe.syntax._
@@ -13,7 +13,7 @@ import com.github.agaro1121.sharedevents.marshalling.GeneralEventEncoders.Messag
 import com.github.agaro1121.sharedevents.marshalling.GeneralEventDecoders.MessageDecoder
 import cats.syntax.either._ //for calling `map` on [[Either]] in Scala v2.11.x
 
-private[client] trait AkkaStreamsComponents {
+trait AkkaStreamsComponents {
 
   val wsMessage2Json: Flow[ws.Message, Either[ParsingFailure, Json], NotUsed] =
     Flow[ws.Message]

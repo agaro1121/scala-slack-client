@@ -33,19 +33,18 @@ val rtmLite = project
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
 
-/*
-// Deprecated
-val rtm = project
-  .in(file("rtm"))
-  .settings(name := "scala-slack-rtm")
-  .settings(compileSettings)
-  .configs(IntegrationTest)
-  .settings(Defaults.itSettings: _*)
-  .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
+val rtmLiteBenchmark = project
+  .in(file("rtm_lite_benchmark"))
+  .settings(name := "scala-slack-rtm-lite-benchmark")
+//  .settings(compileSettings)
+//  .configs(IntegrationTest)
+//  .settings(Defaults.itSettings: _*)
+//  .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
   .dependsOn(rtmLite)
-  .settings(sharedPublishSettings: _*)
-  .enablePlugins(GitVersioning)
-*/
+//  .settings(sharedPublishSettings: _*)
+//  .enablePlugins(GitVersioning)
+  .enablePlugins(JmhPlugin)
+
 
 val web = project
   .in(file("web"))

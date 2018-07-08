@@ -33,7 +33,7 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
   def connectWithPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]): Future[Either[HttpError, RtmStatus]] =
     connectWithFlow(
       wsMessage2Json
-        .via(json2SlackMessage)
+        .via(json2Message)
         .mapAsync(Runtime.getRuntime.availableProcessors)(pf)
         .via(slackMessage2Json)
         .via(json2WsMessage)

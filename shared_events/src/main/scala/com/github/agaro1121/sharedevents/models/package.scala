@@ -1,10 +1,11 @@
 package com.github.agaro1121.sharedevents
 
-package object models{
+package object models {
 
   type ChannelId = String
   type UserId = String
 
-  trait SlackEvent
+  trait SlackEvent extends Product with Serializable
+  trait CustomEvent extends SlackEvent
 
 }

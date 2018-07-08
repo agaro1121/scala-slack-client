@@ -2,7 +2,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.stream.ActorMaterializer
 import com.github.agaro1121.rtmlite
 import com.github.agaro1121.rtmlite.client.AbilityToRespondToRtm
-import com.github.agaro1121.sharedevents.models.Message
+import com.github.agaro1121.sharedevents.models.SlackMessage
 
 object TestBot {
   def props: Props = Props(new TestBot())
@@ -11,8 +11,10 @@ object TestBot {
 class TestBot extends AbilityToRespondToRtm {
   override def receiveWithWsActorToRespond(slack: ActorRef): Receive = {
 
-    case msg@Message(_, _, _, text, _, _, _) =>
-      slack ! msg.replyWithMessage(s"Test Bot received message: $text")
+    case msg@SlackMessage(text, _, _, _, _) =>
+      println(s"Test Bot received Abstract message: $text")
+      slack ! msg.replyWithMessage(s"Test Bot received Abstract message: $text")
+
 
   }
 }

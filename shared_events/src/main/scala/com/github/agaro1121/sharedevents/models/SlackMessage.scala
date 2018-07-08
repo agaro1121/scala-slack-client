@@ -22,15 +22,14 @@ final case class SlackMessage(text: String
 
 object SlackMessage {
   val fromSomeMessage: PartialFunction[GeneralEvent, SlackMessage] = {
-    case msg: Message => SlackMessage(
-      msg.text, msg.channel, msg.user, msg.ts
-    )
-    case msg: EditedMessage => SlackMessage(
-      msg.message.text, msg.channel, msg.message.user, msg.message.ts
-    )
-    case msg: BotMessage => SlackMessage(
-      msg.text, msg.channel, msg.bot_id, msg.ts, true
-    )
+    case Message(_, channelId, userId, text, ts, _, _) =>
+      SlackMessage(text, channelId, userId, ts)
+
+    case EditedMessage(MessageEdited(user, text, _, _), _,_, channel, _, _, ts) =>
+      SlackMessage(text, channel, user, ts)
+
+    case BotMessage(text, botId, _, _, _, channel, _, ts) =>
+      SlackMessage(text, channel, botId, ts, true)
   }
 }
 

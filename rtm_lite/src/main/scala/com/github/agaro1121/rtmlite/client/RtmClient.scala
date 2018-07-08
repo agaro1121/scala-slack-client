@@ -10,7 +10,7 @@ import akka.stream.Materializer
 import cats.data.EitherT
 import cats.implicits._
 import com.github.agaro1121.core.exceptions.HttpError
-import com.github.agaro1121.sharedevents.models
+import com.github.agaro1121.sharedevents.models.SlackMessage
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future
@@ -27,13 +27,13 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
   private def getWebSocketUrl: Future[Either[HttpError, String]] =
     EitherT(rtmConnect()).map(_.url).value
 
-  def connectWithPF(pf: PartialFunction[models.Message, models.Message]): Future[Either[HttpError, RtmStatus]] =
+  def connectWithPF(pf: PartialFunction[SlackMessage, SlackMessage]): Future[Either[HttpError, RtmStatus]] =
     connectWithPFAsync(pf.andThen(Future.successful))
 
-  def connectWithPFAsync(pf: PartialFunction[models.Message, Future[models.Message]]): Future[Either[HttpError, RtmStatus]] =
+  def connectWithPFAsync(pf: PartialFunction[SlackMessage, Future[SlackMessage]]): Future[Either[HttpError, RtmStatus]] =
     connectWithFlow(
       wsMessage2Json
-        .via(json2Message)
+        .via(json2SlackMessage)
         .mapAsync(Runtime.getRuntime.availableProcessors)(pf)
         .via(slackMessage2Json)
         .via(json2WsMessage)
@@ -43,7 +43,7 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
     * You can respond to Slack messages with an actor
     * that extends [[AbilityToRespondToRtm]]
     *
-    * @param actorRef Your actor that responds to [[models.Message]]
+    * @param actorRef Your actor that responds to [[SlackMessage]]
     * */
   def connectWithUntypedActor(actorRef: ActorRef): Future[Either[HttpError, RtmStatus]] =
     connectWithFlow(untypedActorFlow(actorRef))

@@ -19,6 +19,14 @@ class TestBot extends AbilityToRespondToRtm {
   }
 }
 
+object TestBotUsingPf {
+  val handler: PartialFunction[SlackMessage, SlackMessage] = {
+    case msg@SlackMessage(text, _, _, _, _) =>
+      println(s"Test Bot received Abstract message: $text")
+      msg.replyWithMessage(s"Test Bot received Abstract message: $text")
+  }
+}
+
 object TestBotTester extends App {
 
   implicit val system = ActorSystem("main")
@@ -28,5 +36,6 @@ object TestBotTester extends App {
   val rtmClient = rtmlite.client.RtmClient()
   val testBot = system.actorOf(TestBot.props)
 
-  rtmClient.connectWithUntypedActor(testBot).onComplete(println)
+//  rtmClient.connectWithUntypedActor(testBot).onComplete(println)
+  rtmClient.connectWithPF(TestBotUsingPf.handler).onComplete(println)
 }

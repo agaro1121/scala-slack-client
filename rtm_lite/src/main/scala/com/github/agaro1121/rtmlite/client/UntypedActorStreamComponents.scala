@@ -18,11 +18,8 @@ private[client] trait UntypedActorStreamComponents extends LazyLogging {
     * Actors reply with [[Object]] type
     * this will handle the transition to a proper type
     * */
-    val actorReply2SlackMessage: Flow[Object, models.Message, NotUsed] =
-      Flow[Object].map {
-        case o: SlackMessage => o.asInstanceOf[SlackMessage].toMessage
-        case o: models.Message => o.asInstanceOf[models.Message]
-      }
+    val actorReply2SlackMessage: Flow[Object, SlackMessage, NotUsed] =
+      Flow[Object].map(_.asInstanceOf[SlackMessage])
 
     val sink: Sink[Message, NotUsed] =
       wsMessage2Json.via(json2SlackMessage).to(Sink.actorRef(usersActor, PoisonPill))

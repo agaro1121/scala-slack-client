@@ -31,9 +31,9 @@ private[client] trait AkkaStreamsComponents {
       TextMessage.Strict(json.toString)
     }
 
-  val slackMessage2Json: Flow[models.Message, Json, NotUsed] =
-    Flow[models.Message].map{ msg =>
-      msg.asJson.deepMerge(Json.obj(("type", Json.fromString("message"))))
+  val slackMessage2Json: Flow[SlackMessage, Json, NotUsed] =
+    Flow[SlackMessage].map{ msg =>
+      msg.toMessage.asJson.deepMerge(Json.obj(("type", Json.fromString("message"))))
     }
 
   val json2Message: Flow[Either[ParsingFailure, Json], models.Message, NotUsed] =
@@ -65,6 +65,6 @@ private[client] trait AkkaStreamsComponents {
   val wsMessage2SlackMessage: Flow[ws.Message, models.Message, NotUsed] =
     wsMessage2Json.via(json2Message)
 
-  val slackMessage2WsMessage: Flow[models.Message, ws.Message, NotUsed] =
+  val slackMessage2WsMessage: Flow[SlackMessage, ws.Message, NotUsed] =
     slackMessage2Json.via(json2WsMessage)
 }

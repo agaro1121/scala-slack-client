@@ -83,6 +83,5 @@ class RtmClient(implicit val actorSystem: ActorSystem)
 }
 
 object RtmClient {
-  def apply()(implicit actorSystem: ActorSystem, mat: Materializer): RtmClient =
-    new RtmClient()
+  def apply()(implicit actorSystem: ActorSystem): RtmClient = new RtmClient()
 }

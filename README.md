@@ -83,7 +83,6 @@ object TestBotTester extends App {
   import system.dispatcher
 
   val rtmClient = rtmlite.client.RtmClient()
-  val testBot = system.actorOf(TestBot.props)
 
   rtmClient.connectWithPF(TestBotUsingPf.handler).onComplete(println)
 }

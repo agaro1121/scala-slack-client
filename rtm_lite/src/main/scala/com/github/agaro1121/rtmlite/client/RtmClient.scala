@@ -6,7 +6,7 @@ import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.ws
 import akka.http.scaladsl.model.ws.WebSocketRequest
 import akka.stream.scaladsl.Flow
-import akka.stream.Materializer
+import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import cats.data.EitherT
 import cats.implicits._
 import com.github.agaro1121.core.exceptions.HttpError
@@ -14,14 +14,23 @@ import com.github.agaro1121.sharedevents.models.SlackMessage
 import com.typesafe.scalalogging.LazyLogging
 
 import scala.concurrent.Future
-import scala.util.Try
+import scala.util.control.NonFatal
 
-class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
+class RtmClient(implicit val actorSystem: ActorSystem)
   extends LazyLogging
     with AbilityToConnectToRtm
     with AkkaStreamsComponents
     with UntypedActorStreamComponents {
 
+  val decider: Supervision.Decider = {
+    case _: scala.MatchError => Supervision.resume
+    case t if NonFatal(t) => Supervision.resume
+    case _ => Supervision.stop
+  }
+
+  implicit val mat: Materializer = ActorMaterializer(
+    ActorMaterializerSettings(actorSystem)
+      .withSupervisionStrategy(decider))
 
   private def request(webSocketUrl: String): WebSocketRequest =
     WebSocketRequest(uri = webSocketUrl)
@@ -42,13 +51,7 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
     connectWithFlow(
       wsMessage2Json
         .via(json2SlackMessage)
-        .mapAsyncUnordered(Runtime.getRuntime.availableProcessors()){ sm =>
-          try {
-            pf(sm)
-          } catch{
-            case err: MatchError => Future.failed(err)
-          }
-        }
+        .mapAsyncUnordered(Runtime.getRuntime.availableProcessors())(pf)
         .via(slackMessage2Json)
         .via(json2WsMessage)
     )

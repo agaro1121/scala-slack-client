@@ -45,6 +45,29 @@ class TestBot extends AbilityToRespondToRtm {
   }
 }
 
+object TestBotTester extends App {
+
+  implicit val system = ActorSystem("main")
+  implicit val mat = ActorMaterializer()
+  import system.dispatcher
+
+  val rtmClient = rtmlite.client.RtmClient()
+  val testBot = system.actorOf(TestBot.props)
+
+  rtmClient.connectWithUntypedActor(testBot).onComplete(println)
+}
+```
+
+You can also interact with Slack with the following:
+  - `PartialFunction[SlackMessage, SlackMessage]`
+  - `PartialFunction[SlackMessage, Future[SlackMessage]]`
+
+``` scala
+import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.stream.ActorMaterializer
+import com.github.agaro1121.rtmlite
+import com.github.agaro1121.sharedevents.models.SlackMessage
+
 object TestBotUsingPf {
   val handler: PartialFunction[SlackMessage, SlackMessage] = {
     case msg@SlackMessage(text, _, _, _, _) =>
@@ -62,11 +85,5 @@ object TestBotTester extends App {
   val rtmClient = rtmlite.client.RtmClient()
   val testBot = system.actorOf(TestBot.props)
 
-//  rtmClient.connectWithUntypedActor(testBot).onComplete(println)
   rtmClient.connectWithPF(TestBotUsingPf.handler).onComplete(println)
 }
-```
-
-You can also interact with Slack with the following:
-  - `PartialFunction[models.Message, models.Message]`
-  - `PartialFunction[models.Message, Future[models.Message]]`

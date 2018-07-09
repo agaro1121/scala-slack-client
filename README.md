@@ -63,7 +63,7 @@ You can also interact with Slack with the following:
   - `PartialFunction[SlackMessage, Future[SlackMessage]]`
 
 ``` scala
-import akka.actor.{ActorRef, ActorSystem, Props}
+import akka.actor.ActorSystem
 import akka.stream.ActorMaterializer
 import com.github.agaro1121.rtmlite
 import com.github.agaro1121.sharedevents.models.SlackMessage

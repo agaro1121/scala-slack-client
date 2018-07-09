@@ -12,7 +12,6 @@ import cats.implicits._
 import com.github.agaro1121.core.exceptions.HttpError
 import com.github.agaro1121.sharedevents.models.SlackMessage
 import com.typesafe.scalalogging.LazyLogging
-
 import scala.concurrent.Future
 
 class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
@@ -21,6 +20,7 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
     with AkkaStreamsComponents
     with UntypedActorStreamComponents {
 
+
   private def request(webSocketUrl: String): WebSocketRequest =
     WebSocketRequest(uri = webSocketUrl)
 
@@ -28,13 +28,19 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
     EitherT(rtmConnect()).map(_.url).value
 
   def connectWithPF(pf: PartialFunction[SlackMessage, SlackMessage]): Future[Either[HttpError, RtmStatus]] =
-    connectWithPFAsync(pf.andThen(Future.successful))
+    connectWithFlow(
+      wsMessage2Json
+        .via(json2SlackMessage)
+        .collect(pf)
+        .via(slackMessage2Json)
+        .via(json2WsMessage)
+    )
 
   def connectWithPFAsync(pf: PartialFunction[SlackMessage, Future[SlackMessage]]): Future[Either[HttpError, RtmStatus]] =
     connectWithFlow(
       wsMessage2Json
         .via(json2SlackMessage)
-        .mapAsync(Runtime.getRuntime.availableProcessors)(pf)
+        .mapAsyncUnordered(Runtime.getRuntime.availableProcessors())(pf)
         .via(slackMessage2Json)
         .via(json2WsMessage)
     )

@@ -12,7 +12,9 @@ import cats.implicits._
 import com.github.agaro1121.core.exceptions.HttpError
 import com.github.agaro1121.sharedevents.models.SlackMessage
 import com.typesafe.scalalogging.LazyLogging
+
 import scala.concurrent.Future
+import scala.util.Try
 
 class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
   extends LazyLogging
@@ -40,7 +42,13 @@ class RtmClient(implicit val actorSystem: ActorSystem, val mat: Materializer)
     connectWithFlow(
       wsMessage2Json
         .via(json2SlackMessage)
-        .mapAsyncUnordered(Runtime.getRuntime.availableProcessors())(pf)
+        .mapAsyncUnordered(Runtime.getRuntime.availableProcessors()){ sm =>
+          try {
+            pf(sm)
+          } catch{
+            case err: MatchError => Future.failed(err)
+          }
+        }
         .via(slackMessage2Json)
         .via(json2WsMessage)
     )

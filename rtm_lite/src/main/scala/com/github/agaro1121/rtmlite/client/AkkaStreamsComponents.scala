@@ -46,7 +46,6 @@ private[client] trait AkkaStreamsComponents {
       jsonOrError.flatMap{ json =>
         json.as[models.Message]
           .orElse(json.as[models.EditedMessage])
-          .orElse(json.as[models.BotMessage])
       }
     }
 

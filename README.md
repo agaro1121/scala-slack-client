@@ -15,8 +15,7 @@ Add the following to your build.sbt
 ```scala
 resolvers += Resolver.bintrayRepo("agaro1121", "com.github.agaro1121")
 
-libraryDependencies += "com.github.agaro1121" %% "scala-slack-rtm-lite" % "0.2.22"
-libraryDependencies += "com.github.agaro1121" %% "scala-slack-web" % "0.2.22"
+libraryDependencies += "com.github.agaro1121" %% "scala-slack-rtm-lite" % "0.2.26"
 ```
 
 
@@ -29,7 +28,7 @@ import akka.actor.{ActorRef, ActorSystem, Props}
 import akka.stream.ActorMaterializer
 import com.github.agaro1121.rtmlite
 import com.github.agaro1121.rtmlite.client.AbilityToRespondToRtm
-import com.github.agaro1121.sharedevents.models.Message
+import com.github.agaro1121.sharedevents.models.SlackMessage
 
 object TestBot {
   def props: Props = Props(new TestBot())
@@ -38,8 +37,10 @@ object TestBot {
 class TestBot extends AbilityToRespondToRtm {
   override def receiveWithWsActorToRespond(slack: ActorRef): Receive = {
 
-    case msg@Message(_, _, _, text, _, _, _) =>
-      slack ! msg.replyWithMessage(s"Test Bot received message: $text")
+    case msg@SlackMessage(text, _, _, _, _) =>
+      println(s"Test Bot received Abstract message: $text")
+      slack ! msg.replyWithMessage(s"Test Bot received Abstract message: $text")
+
 
   }
 }
@@ -58,5 +59,30 @@ object TestBotTester extends App {
 ```
 
 You can also interact with Slack with the following:
-  - `PartialFunction[models.Message, models.Message]`
-  - `PartialFunction[models.Message, Future[models.Message]]`
+  - `PartialFunction[SlackMessage, SlackMessage]`
+  - `PartialFunction[SlackMessage, Future[SlackMessage]]`
+
+``` scala
+import akka.actor.ActorSystem
+import akka.stream.ActorMaterializer
+import com.github.agaro1121.rtmlite
+import com.github.agaro1121.sharedevents.models.SlackMessage
+
+object TestBotUsingPf {
+  val handler: PartialFunction[SlackMessage, SlackMessage] = {
+    case msg@SlackMessage(text, _, _, _, _) =>
+      println(s"Test Bot received Abstract message: $text")
+      msg.replyWithMessage(s"Test Bot received Abstract message: $text")
+  }
+}
+
+object TestBotTester extends App {
+
+  implicit val system = ActorSystem("main")
+  implicit val mat = ActorMaterializer()
+  import system.dispatcher
+
+  val rtmClient = rtmlite.client.RtmClient()
+
+  rtmClient.connectWithPF(TestBotUsingPf.handler).onComplete(println)
+}

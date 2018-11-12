@@ -5,7 +5,6 @@ package com.github.agaro1121.sharedevents.models
   * Currently the running list is:
   * - EditedMessage
   * - Message
-  * - BotMessage
   * */
 final case class SlackMessage(text: String
                         ,channel: ChannelId

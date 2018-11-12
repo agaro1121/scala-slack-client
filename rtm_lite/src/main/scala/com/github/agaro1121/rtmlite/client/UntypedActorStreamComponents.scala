@@ -1,19 +1,21 @@
 package com.github.agaro1121.rtmlite.client
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.actor.{ActorRef, PoisonPill}
 import akka.http.scaladsl.model.ws
 import akka.http.scaladsl.model.ws.Message
 import akka.stream.OverflowStrategy
-import akka.stream.scaladsl.{Flow, Sink, Source}
+import akka.stream.scaladsl.{Flow, Keep, Sink, Source}
 import com.github.agaro1121.sharedevents.models
 import com.github.agaro1121.sharedevents.models.SlackMessage
 import com.typesafe.scalalogging.LazyLogging
 
+import scala.concurrent.Future
+
 private[client] trait UntypedActorStreamComponents extends LazyLogging {
   this: AkkaStreamsComponents =>
 
-  def untypedActorFlow(usersActor: ActorRef): Flow[ws.Message, ws.Message, NotUsed] = {
+  def untypedActorFlow(usersActor: ActorRef): Flow[Message, Message, NotUsed] = {
     /*
     * Actors reply with [[Object]] type
     * this will handle the transition to a proper type

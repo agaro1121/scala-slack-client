@@ -43,24 +43,11 @@ object TestBotTester extends App {
 //  val result = rtmClient.connectWithUntypedActor(testBot)
   val result = rtmClient.connectWithPF(TestBotUsingPf.handler)
 
-    result.onComplete {
-      case scala.util.Success(value) =>
-        value.fold(
-          err => println(err), {
-          case (connectionStatus, done) =>
-            connectionStatus.onComplete(println)
-            done.onComplete{ d =>
-              println(s"Stream completed as: $d")
-              println("Shutting down application...")
-              system.terminate().onComplete{
-                t =>
-                  println(s"Actor System terminated: $t")
-                  System.exit(-1)
-              }
-            }
-          })
-
-      case scala.util.Failure(exception) =>
-        println(exception.getMessage)
-    }
+  result.onComplete{
+    case scala.util.Success((status, streamDone)) =>
+      println(status)
+      streamDone.onComplete(println)
+    case scala.util.Failure(exception) =>
+      println(exception.getMessage)
+  }
 }

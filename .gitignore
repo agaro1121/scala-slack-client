@@ -159,3 +159,11 @@ project/plugins/project/
 publishing
 local.*
 *.bloop
+/secring.asc
+/trustdb.gpg
+/pubring.asc
+/pubring.kbx
+/openpgp-revocs.d/
+/crls.d/
+/private-keys-v1.d/
+/travisORIG/

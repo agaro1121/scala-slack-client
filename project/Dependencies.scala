@@ -3,14 +3,14 @@ import sbt._
 object Dependencies {
 
   object Versions {
-    val AkkaHttp = "10.1.3"
-    val Akka = "2.5.13"
-    val Circe = "0.9.3"
-    val Cats = "1.0.1"
-    val PureConfig = "0.9.1"
+    val AkkaHttp = "10.1.5"
+    val Akka = "2.5.17"
+    val Circe = "0.10.0"
+    val Cats = "1.4.0"
+    val PureConfig = "0.9.2"
     val ScalaLogging = "3.9.0"
-    val AkkaHttpCirce = "1.21.0"
     val LogBack = "1.2.3"
+    val AkkaHttpCirce = "1.22.0"
     val ScalaTest = "3.0.5"
   }
 

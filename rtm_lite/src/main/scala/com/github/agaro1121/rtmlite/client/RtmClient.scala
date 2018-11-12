@@ -1,11 +1,11 @@
 package com.github.agaro1121.rtmlite.client
 
-import akka.NotUsed
+import akka.{Done, NotUsed}
 import akka.actor.{ActorRef, ActorSystem}
 import akka.http.scaladsl.model.StatusCodes
 import akka.http.scaladsl.model.ws
 import akka.http.scaladsl.model.ws.WebSocketRequest
-import akka.stream.scaladsl.Flow
+import akka.stream.scaladsl.{Flow, Keep}
 import akka.stream.{ActorMaterializer, ActorMaterializerSettings, Materializer, Supervision}
 import cats.data.EitherT
 import cats.implicits._
@@ -38,7 +38,7 @@ class RtmClient(implicit val actorSystem: ActorSystem)
   private def getWebSocketUrl: Future[Either[HttpError, String]] =
     EitherT(rtmConnect()).map(_.url).value
 
-  def connectWithPF(pf: PartialFunction[SlackMessage, SlackMessage]): Future[Either[HttpError, RtmStatus]] =
+  def connectWithPF(pf: PartialFunction[SlackMessage, SlackMessage]): Future[(RtmStatus, Future[Done])] =
     connectWithFlow(
       wsMessage2Json
         .via(json2SlackMessage)
@@ -47,7 +47,7 @@ class RtmClient(implicit val actorSystem: ActorSystem)
         .via(json2WsMessage)
     )
 
-  def connectWithPFAsync(pf: PartialFunction[SlackMessage, Future[SlackMessage]]): Future[Either[HttpError, RtmStatus]] =
+  def connectWithPFAsync(pf: PartialFunction[SlackMessage, Future[SlackMessage]]): Future[(RtmStatus, Future[Done])] =
     connectWithFlow(
       wsMessage2Json
         .via(json2SlackMessage)
@@ -62,22 +62,27 @@ class RtmClient(implicit val actorSystem: ActorSystem)
     *
     * @param actorRef Your actor that responds to [[SlackMessage]]
     * */
-  def connectWithUntypedActor(actorRef: ActorRef): Future[Either[HttpError, RtmStatus]] =
+  def connectWithUntypedActor(actorRef: ActorRef): Future[(RtmStatus, Future[Done])] =
     connectWithFlow(untypedActorFlow(actorRef))
 
-  def connectWithFlow(flow: Flow[ws.Message, ws.Message, NotUsed]): Future[Either[HttpError, RtmStatus]] = {
-    EitherT(getWebSocketUrl).map { rtmUrl =>
-      httpClient.singleWebSocketRequest(request(rtmUrl), flow)._1
-        .map { wsu =>
+  def connectWithFlow(flow: Flow[ws.Message, ws.Message, NotUsed]): Future[(RtmStatus, Future[Done])] = {
+    getWebSocketUrl.flatMap{
+      case Right(rtmUrl) =>
+        val (status, streamDone) = httpClient.singleWebSocketRequest(request(rtmUrl), flow.watchTermination()(Keep.right))
+        status.map { wsu =>
           if (wsu.response.status == StatusCodes.SwitchingProtocols) {
             logger.info("successfully connected to Slack.Rtm")
-            RtmStatus.Success
+            (RtmStatus.Success, streamDone)
           } else {
             logger.error("Could not connect to Slack.Rtm")
-            RtmStatus.Failure
+            (RtmStatus.Failure, streamDone)
           }
         }
-    }.leftMap(Future.successful).value.flatMap(_.bisequence)
+
+      case Left(error) =>
+        logger.error(error.msg)
+        Future.successful( (RtmStatus.Failure, Future.successful(Done)) )
+    }
   }
 
 }

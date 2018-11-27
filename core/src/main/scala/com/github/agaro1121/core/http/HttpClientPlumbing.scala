@@ -6,8 +6,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.unmarshalling.{Unmarshal, Unmarshaller}
 import akka.http.scaladsl.{Http, HttpExt}
 import akka.stream.Materializer
-import cats.data.EitherT
-import cats.implicits._
+import cats.syntax.either._
 import com.github.agaro1121.core.config.SlackClientConfig
 import com.github.agaro1121.core.exceptions.{BadHttpStatus, GeneralHttpException, HttpError}
 import com.typesafe.scalalogging.LazyLogging
@@ -17,31 +16,31 @@ import scala.concurrent.{ExecutionContext, Future}
 
 trait HttpClientPlumbing extends LazyLogging {
 
-  protected implicit def genericFromJsonConverter = HttpClientPlumbing.syntax.GenericFromJsonConverter _
+  protected implicit val genericFromJsonConverter = HttpClientPlumbing.GenericFromJsonConverter _
   protected def httpClient: HttpExt = Http()
   protected def slackClientConfig: SlackClientConfig = SlackClientConfig.fromReference
   protected implicit def actorSystem: ActorSystem
   protected implicit def mat: Materializer
   protected implicit def ec: ExecutionContext = actorSystem.dispatcher
 
-  protected def getAndHandleResponse(endpoint: String, queryParams: Option[Map[String, String]] = None): Future[Either[Future[HttpError], ResponseEntity]] =
+  protected def getAndHandleResponse(endpoint: String, queryParams: Option[Map[String, String]] = None): Future[Either[HttpError, ResponseEntity]] =
     handleResponse(getResponse(endpoint, queryParams))
 
-  protected def handleResponse(response: Future[HttpResponse]): Future[Either[Future[HttpError], ResponseEntity]] = {
-    response.map { httpResponse =>
+  protected def handleResponse(response: Future[HttpResponse]): Future[Either[HttpError, ResponseEntity]] = {
+    response.flatMap { httpResponse =>
         httpResponse.status match {
           case StatusCodes.OK =>
-            httpResponse.entity.asRight
+            Future.successful(httpResponse.entity.asRight[HttpError])
 
           case _ =>
             Unmarshal(httpResponse.entity)
               .to[String]
-              .map(BadHttpStatus(httpResponse.status, _)).asLeft
+              .map(BadHttpStatus(httpResponse.status, _).asLeft[ResponseEntity])
         }
     }
     .recover {
       case throwable =>
-        Future.successful(GeneralHttpException(throwable.getMessage)).asLeft
+        GeneralHttpException(throwable.getMessage).asLeft
     }
   }
 
@@ -57,15 +56,21 @@ trait HttpClientPlumbing extends LazyLogging {
 }
 
 object HttpClientPlumbing {
-  object syntax {
-    implicit class GenericFromJsonConverter(val response: Future[Either[Future[HttpError], ResponseEntity]]) extends AnyVal {
-      def as[T: Decoder](implicit mat: Materializer, um: Unmarshaller[ResponseEntity, T], ec: ExecutionContext)
-      :Future[Either[HttpError, T]] = {
-        EitherT(response)
-          .map(Unmarshal(_).to[T])
-          .value
-          .flatMap(_.bisequence) //TODO: Recover here
+
+    implicit class GenericFromJsonConverter(val response: Future[Either[HttpError, ResponseEntity]]) extends AnyVal {
+
+      def as[T: Decoder](implicit mat: Materializer,
+                         um: Unmarshaller[ResponseEntity, T],
+                         ec: ExecutionContext): Future[Either[HttpError, T]] = {
+        import cats.implicits._
+        response.flatMap { errorOrEntity =>
+          errorOrEntity.map{ entity =>
+            Unmarshal(entity).to[T]
+          }.leftMap(Future.successful).bisequence
+        }
       }
     }
-  }
+
+//    def toGenericFromJsonConverter(response: Future[Either[HttpError, ResponseEntity]]): GenericFromJsonConverter =
+//      new GenericFromJsonConverter(response)
 }

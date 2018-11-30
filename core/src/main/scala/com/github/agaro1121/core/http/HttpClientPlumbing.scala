@@ -64,13 +64,10 @@ object HttpClientPlumbing {
                          ec: ExecutionContext): Future[Either[HttpError, T]] = {
         import cats.implicits._
         response.flatMap { errorOrEntity =>
-          errorOrEntity.map{ entity =>
-            Unmarshal(entity).to[T]
-          }.leftMap(Future.successful).bisequence
+          errorOrEntity
+            .bimap(Future.successful, Unmarshal(_).to[T])
+            .bisequence
         }
       }
     }
-
-//    def toGenericFromJsonConverter(response: Future[Either[HttpError, ResponseEntity]]): GenericFromJsonConverter =
-//      new GenericFromJsonConverter(response)
 }

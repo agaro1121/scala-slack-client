@@ -1,6 +1,6 @@
 package com.github.agaro1121.core.config
 
-import pureconfig.{ConfigReader, loadConfig}
+import pureconfig._
 
 trait ConfigUtils {
 

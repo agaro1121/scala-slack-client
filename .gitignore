@@ -167,3 +167,4 @@ local.*
 /crls.d/
 /private-keys-v1.d/
 /travisORIG/
+/.metals/

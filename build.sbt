@@ -33,20 +33,6 @@ val rtmLite = project
   .settings(sharedPublishSettings: _*)
   .enablePlugins(GitVersioning)
 
-/*
-// Deprecated
-val rtm = project
-  .in(file("rtm"))
-  .settings(name := "scala-slack-rtm")
-  .settings(compileSettings)
-  .configs(IntegrationTest)
-  .settings(Defaults.itSettings: _*)
-  .settings(libraryDependencies ++= Seq(Dependencies.ScalaTest, Dependencies.ScalaTestIt))
-  .dependsOn(rtmLite)
-  .settings(sharedPublishSettings: _*)
-  .enablePlugins(GitVersioning)
-*/
-
 val web = project
   .in(file("web"))
   .settings(name := "scala-slack-web")

@@ -14,11 +14,7 @@ object TestBot {
       msg.replyWithMessage(s"Test Bot received Abstract message: $text")
   }
 
-  val handlerFuture: PartialFunction[SlackMessage, Future[SlackMessage]] = {
-    case msg@SlackMessage(text, _, _, _, _) =>
-      println(s"Test Bot received Abstract message: $text")
-      Future.successful(msg.replyWithMessage(s"Test Bot received Abstract message: $text"))
-  }
+  val handlerFuture: PartialFunction[SlackMessage, Future[SlackMessage]] = handler.andThen(Future.successful)
 }
 
 class TestBot extends AbilityToRespondToRtm {
@@ -44,9 +40,9 @@ object TestBotRunner extends App {
   val rtmClient = rtmlite.client.RtmClient()
   val testBot = system.actorOf(TestBot.props)
 
-//  val result = rtmClient.connectWithUntypedActor(testBot)
+  val result = rtmClient.connectWithUntypedActor(testBot)
 //  val result = rtmClient.connectWithPF(TestBot.handler)
-  val result = rtmClient.connectWithPFAsync(TestBot.handlerFuture)
+//  val result = rtmClient.connectWithPFAsync(TestBot.handlerFuture)
 
   result.onComplete{
     case scala.util.Success((status, streamDone)) =>

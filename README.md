@@ -1,6 +1,6 @@
 # README #
 
-# Updates coming soon !!!!
+# Updates coming soon !!!
 
 This is my attempt to provide a library that will allow users to create bots.
 

@@ -8,7 +8,7 @@ object Dependencies {
     val Circe = "0.11.1"
     val Cats = "1.6.0"
     val PureConfig = "0.10.2"
-    val ScalaLogging = "3.9.2"
+    val ScalaLogging = "3.9.0"
     val LogBack = "1.2.3"
     val AkkaHttpCirce = "1.25.2"
     val ScalaTest = "3.0.7"

@@ -1,12 +1,12 @@
 package com.github.agaro1121.rtmlite.config
 
-import com.github.agaro1121.core.config.ConfigUtils
+import pureconfig._
 import pureconfig.generic.auto._
 
 case class RtmConfig(rtmConnect: String)
 
-object RtmConfig extends ConfigUtils {
+object RtmConfig {
 
-  val default: RtmConfig = unsafeLoadConfig[RtmConfig]("slack")
+  val default: RtmConfig = loadConfigOrThrow[RtmConfig]("slack")
 
 }

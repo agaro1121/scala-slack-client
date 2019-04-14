@@ -1,14 +1,14 @@
 package com.github.agaro1121.web.config
 
-import com.github.agaro1121.core.config.ConfigUtils
+import pureconfig._
 import pureconfig.generic.auto._
 
 case class Endpoints(listUsers: String)
 
 case class WebApiConfig(endpoints: Endpoints)
 
-object WebApiConfig extends ConfigUtils {
+object WebApiConfig {
 
-  def default: WebApiConfig = unsafeLoadConfig[WebApiConfig]("slack")
+  def default: WebApiConfig = loadConfigOrThrow[WebApiConfig]("slack")
 
 }

@@ -24,24 +24,6 @@ trait HttpClientPlumbing extends LazyLogging {
   protected implicit lazy val ec: ExecutionContext = actorSystem.dispatcher
 
   protected def getAndHandleResponse(endpoint: String, queryParams: Option[Map[String, String]] = None): Future[Either[HttpError, ResponseEntity]] = {
-    def handleResponse(response: Future[HttpResponse]): Future[Either[HttpError, ResponseEntity]] = {
-      response.flatMap { httpResponse =>
-          httpResponse.status match {
-            case StatusCodes.OK =>
-              Future.successful(httpResponse.entity.asRight[HttpError])
-
-            case _ =>
-              Unmarshal(httpResponse.entity)
-                .to[String]
-                .map(BadHttpStatus(httpResponse.status, _).asLeft[ResponseEntity])
-          }
-      }
-      .recover {
-        case throwable =>
-          GeneralHttpException(throwable.getMessage).asLeft
-      }
-    }
-
     def createHttpRequest(apiUrl: String): HttpRequest = {
       val uri = Uri(apiUrl)
         .withPath(Path(endpoint))
@@ -50,7 +32,22 @@ trait HttpClientPlumbing extends LazyLogging {
       HttpRequest(uri = uri)
     }
 
-    handleResponse(httpClient.singleRequest(request = createHttpRequest(slackClientConfig.apiUrl)))
+    httpClient.singleRequest(request = createHttpRequest(slackClientConfig.apiUrl))
+      .flatMap { httpResponse =>
+        httpResponse.status match {
+          case StatusCodes.OK =>
+            Future.successful(httpResponse.entity.asRight[HttpError])
+
+          case _ =>
+            Unmarshal(httpResponse.entity)
+              .to[String]
+              .map(BadHttpStatus(httpResponse.status, _).asLeft[ResponseEntity])
+        }
+      }
+      .recover {
+        case throwable =>
+          GeneralHttpException(throwable.getMessage).asLeft
+      }
   }
 
 }

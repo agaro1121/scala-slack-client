@@ -17,11 +17,11 @@ import scala.concurrent.{ExecutionContext, Future}
 trait HttpClientPlumbing extends LazyLogging {
 
   protected implicit val genericFromJsonConverter = HttpClientPlumbing.GenericFromJsonConverter _
-  protected def httpClient: HttpExt = Http()
-  protected def slackClientConfig: SlackClientConfig = SlackClientConfig.fromReference
+  protected val httpClient: HttpExt = Http()
+  protected val slackClientConfig: SlackClientConfig = SlackClientConfig.fromReference
   protected implicit def actorSystem: ActorSystem
   protected implicit def mat: Materializer
-  protected implicit def ec: ExecutionContext = actorSystem.dispatcher
+  protected implicit lazy val ec: ExecutionContext = actorSystem.dispatcher
 
   protected def getAndHandleResponse(endpoint: String, queryParams: Option[Map[String, String]] = None): Future[Either[HttpError, ResponseEntity]] =
     handleResponse(getResponse(endpoint, queryParams))

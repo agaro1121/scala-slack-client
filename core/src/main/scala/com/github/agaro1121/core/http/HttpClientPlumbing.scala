@@ -23,34 +23,34 @@ trait HttpClientPlumbing extends LazyLogging {
   protected implicit def mat: Materializer
   protected implicit lazy val ec: ExecutionContext = actorSystem.dispatcher
 
-  protected def getAndHandleResponse(endpoint: String, queryParams: Option[Map[String, String]] = None): Future[Either[HttpError, ResponseEntity]] =
-    handleResponse(getResponse(endpoint, queryParams))
+  protected def getAndHandleResponse(endpoint: String, queryParams: Option[Map[String, String]] = None): Future[Either[HttpError, ResponseEntity]] = {
+    def handleResponse(response: Future[HttpResponse]): Future[Either[HttpError, ResponseEntity]] = {
+      response.flatMap { httpResponse =>
+          httpResponse.status match {
+            case StatusCodes.OK =>
+              Future.successful(httpResponse.entity.asRight[HttpError])
 
-  protected def handleResponse(response: Future[HttpResponse]): Future[Either[HttpError, ResponseEntity]] = {
-    response.flatMap { httpResponse =>
-        httpResponse.status match {
-          case StatusCodes.OK =>
-            Future.successful(httpResponse.entity.asRight[HttpError])
-
-          case _ =>
-            Unmarshal(httpResponse.entity)
-              .to[String]
-              .map(BadHttpStatus(httpResponse.status, _).asLeft[ResponseEntity])
-        }
+            case _ =>
+              Unmarshal(httpResponse.entity)
+                .to[String]
+                .map(BadHttpStatus(httpResponse.status, _).asLeft[ResponseEntity])
+          }
+      }
+      .recover {
+        case throwable =>
+          GeneralHttpException(throwable.getMessage).asLeft
+      }
     }
-    .recover {
-      case throwable =>
-        GeneralHttpException(throwable.getMessage).asLeft
+
+    def createHttpRequest(apiUrl: String): HttpRequest = {
+      val uri = Uri(apiUrl)
+        .withPath(Path(endpoint))
+        .withQuery(Query(queryParams.getOrElse(Map.empty[String, String])))
+      logger.info(s"Calling url=$uri")
+      HttpRequest(uri = uri)
     }
-  }
 
-  protected def getResponse(endpoint: String, queryParams: Option[Map[String, String]]): Future[HttpResponse] =
-      httpClient.singleRequest(request = createHttpRequest(slackClientConfig.apiUrl, endpoint, queryParams))
-
-  protected def createHttpRequest(apiUrl: String, endpoint: String, queryParams: Option[Map[String, String]]): HttpRequest = {
-    val uri = Uri(apiUrl).withPath(Path(endpoint)).withQuery(Query(queryParams.getOrElse(Map.empty[String, String])))
-    logger.info(s"Calling url=$uri")
-    HttpRequest(uri = uri)
+    handleResponse(httpClient.singleRequest(request = createHttpRequest(slackClientConfig.apiUrl)))
   }
 
 }
